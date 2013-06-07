@@ -8,6 +8,7 @@ trap('INT') { server.shutdown }
 class MyController < ControllerBase
   def go
 
+    return if @req.path == '/favicon.ico'
     # case @req.path
     # when "/redirect"
     #   redirect_to('http://www.google.com')
@@ -16,7 +17,8 @@ class MyController < ControllerBase
     # end
 
     # after you have template rendering, uncomment:
-   render :show
+
+    render :show
 
     # after you have sessions going, uncomment:
 #    session["count"] ||= 0

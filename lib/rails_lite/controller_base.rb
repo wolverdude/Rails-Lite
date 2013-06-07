@@ -11,6 +11,7 @@ class ControllerBase
   end
 
   def session
+    @session ||= Session.new(@req)
   end
 
   def already_rendered?
@@ -21,7 +22,7 @@ class ControllerBase
     raise "Can't respond twice" if already_rendered?
 
     @res.set_redirect(WEBrick::HTTPStatus::Found, url)
-    @response_built = true
+    after_respond
   end
 
   def render_content(content, type)
@@ -29,7 +30,7 @@ class ControllerBase
 
     @res.body = content
     @res.content_type = type
-    @response_built = true
+    after_respond
   end
 
   def render(template_name)
@@ -44,5 +45,11 @@ class ControllerBase
   end
 
   def invoke_action(name)
+  end
+
+  private
+  def after_respond
+    @session and @session.store_session(@res)
+    @response_built = true
   end
 end

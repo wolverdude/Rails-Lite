@@ -3,32 +3,26 @@ require 'webrick'
 
 class Session
   def initialize(req)
-    @index = req.cookies.index { |cookie| cookie.name == '_rails_lite_app' }
+    cookie = req.cookies.select do |cookie|
+      cookie.name == '_rails_lite_app'
+    end.first
 
-    @session = (@index.nil?) ? {} : JSON.parse(req.cookies[@index].value)
-
-    @domain = "#{req.host}:#{req.port}"
+    @session = (cookie) ? JSON.parse(cookie.value) : {}
   end
 
   def [](key)
-    @session[key]
+    @session[key.to_s]
   end
 
   def []=(key, val)
-    @index ||= store_session(res)
-    cookie = Webrick::Cookie.new
-
-    cookie.domain = @domain
-    cookie.name = key
-    cookie.value = val
-
-    @cookies
+    @session[key.to_s] = val
   end
 
   def store_session(res)
-    cookie = Webrick::Cookie.new
-    cookie.domain = @domain
-    cookie.name = '_rails_lite_app'
-    @res.cookies <<
+    value = JSON.generate(@session).to_s
+
+    cookie = WEBrick::Cookie.new('_rails_lite_app', value)
+
+    res.cookies << cookie
   end
 end
