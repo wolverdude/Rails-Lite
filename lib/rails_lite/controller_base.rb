@@ -8,6 +8,7 @@ class ControllerBase
 
   def initialize(req, res, route_params = {})
     @req, @res = req, res
+    @params = Params::parse(@req, route_params)
   end
 
   def session
